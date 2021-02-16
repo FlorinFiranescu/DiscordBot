@@ -1,5 +1,6 @@
 import discord
 import json
+import Scrapping
 #async lib, uses callbacks
 import random
 def getBotKey():
@@ -42,11 +43,18 @@ async def on_message(message):
         await message.channel.send("Hello there, partner!")
 
     if bot_mention in message.content:
+        content = message.content.split()
         commands = getCommands()
         #decode the message
         for k,v in commands.items():
-            if k in message.content.split():
-                await message.channel.send(returnUtil(message.author, v))
+            if k == "affixes" and k in content:
+                spec = None
+                if len(content) >= 3:
+                    spec = content[2]
+                await  message.channel.send(returnUtil(message.author, Scrapping.getAffixes(v, spec)))
+            #if k in message.content.split():
+            #    await message.channel.send(returnUtil(message.author, v))
+
 
 
 
