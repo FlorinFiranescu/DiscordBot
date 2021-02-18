@@ -1,6 +1,7 @@
 import discord
 import json
 import Scrapping
+from Scrapping import getLegendary
 #async lib, uses callbacks
 import random
 def getBotKey():
@@ -19,12 +20,13 @@ def returnUtil(user, util):
     user = str(user)
     user = user[:-5]
     listOfMessages = [
-        "Here you go, {}".format(user),
-        "Well.. well.. {}, you are a picky one!".format(user),
-        "Not your best week, ain't it {}?".format(user),
-        "So you finally got that nice trinket, {}?".format(user),
-        "{}.. I swear to god, if you are asking me again for the same site i am going to.....".format(user),
-        "Bwonsamdi been expectin' ya, {} :> ".format(user),
+        #"Here you go, {}".format(user),
+        #"Well.. well.. {}, you are a picky one!".format(user),
+        #"Not your best week, ain't it {}?".format(user),
+        #"So you finally got that nice trinket, {}?".format(user),
+        #"{}.. I swear to god, if you are asking me again for the same site i am going to.....".format(user),
+        #"Bwonsamdi been expectin' ya, {} :> ".format(user),
+        "Hello there, {}!".format(user)
     ]
     return '{}\n{}'.format(random.choice(listOfMessages), util)
 
@@ -44,16 +46,29 @@ async def on_message(message):
 
     if bot_mention in message.content:
         content = message.content.split()
+        commandList = content[1].split('-')
         commands = getCommands()
         #decode the message
         for k,v in commands.items():
-            if k == "affixes" and k in content:
+
+            if k == "!affixes" and k in commandList:
                 spec = None
-                if len(content) >= 3:
-                    spec = content[2]
-                await  message.channel.send(returnUtil(message.author, Scrapping.getAffixes(v, spec)))
-            #if k in message.content.split():
-            #    await message.channel.send(returnUtil(message.author, v))
+                print(commandList)
+                if len(commandList) == 1:
+                    await  message.channel.send(returnUtil(message.author, Scrapping.getAffixes(v)))
+                elif len(commandList) == 2:
+                    spec = commandList[1]
+                    await  message.channel.send(returnUtil(message.author, Scrapping.getAffixes(v, spec)))
+                elif(len(commandList) >2 ):
+                    spec = commandList[1]
+                    await  message.channel.send("Your command does not match my expectations.\nWhen talking about affixes, the format is !affixes-spec , where spec -> (dungeon, melee, range, healer))\n{}"
+                    .format(returnUtil(message.author, Scrapping.getAffixes(v, spec))))
+            elif k == "!legendary" and k in commandList:
+                if len(commandList) == 1:
+                    await message.channel.send("What do you want to know about your legendaries? I know only about sould ash required for craft or upgrade.")
+                elif len(commandList) == 2:
+                    subCommand = commandList[1]
+                    await message.channel.send(getLegendary(subCommand))
 
 
 

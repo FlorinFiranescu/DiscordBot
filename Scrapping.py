@@ -15,6 +15,42 @@ def request2BfSoupObj(URL):
     soup = BeautifulSoup(page.text, 'html.parser')      #using the html parser, easier to search in browser
     return soup
 
+def getLegendary(subCommand):
+    if subCommand == "craft":
+        return getLegendCraft()
+    elif subCommand == "upgrade":
+        return getLegendMatsUpgrade()
+    else:
+        return "Unknown sub-command: {}".format(subCommand)
+
+def getLegendCraft():
+    message = '''
+Rank 1: Item Level 190. Costs 1,250 Soul Ash.
+Rank 2: Item Level 210. Costs 2,000 Soul Ash
+Rank 3: Item Level 225. Costs 3,200 Soul Ash.
+Rank 4: Item Level 235. Costs 5,150 Soul Ash.
+    '''
+    return message
+
+def getLegendMatsUpgrade():
+    rank1 = 1250
+    rank2 = 2000
+    rank3 = 3200
+    rank4 = 5150
+    message = ""
+    ranks = [rank1, rank2, rank3, rank4]
+    it = 0
+    for rankTarget in ranks:
+        it += 1
+        ct = 0
+        for rankDiff in ranks:
+            ct += 1
+            if rankDiff <= rankTarget:
+                continue
+            else:
+                message = message + "Rank {} -> Rank {} : Cost -> {} Soul Ash\n".format(it, ct, rankDiff-rankTarget)
+    return message
+
 def getAffixes(URL, spec = None):
 
     soup = request2BfSoupObj(URL)
@@ -24,7 +60,7 @@ def getAffixes(URL, spec = None):
         print(e)
         return "Hm, there is something wrong. I can't find them for you"
     if spec == None:
-        return "Oh, ok. Here are your affixes:\n{}".format(affixes.get_text().strip())
+        return "Here are your affixes:\n{}".format(affixes.get_text().strip())
     elif spec.lower() not in specs:
         return "I don't know who is this guy {} but.. Here are your affixes:\n{}".format(spec, affixes.get_text().strip())
     else:
@@ -36,7 +72,7 @@ def getAffixes(URL, spec = None):
     currentAffixes = affixes.get_text().strip()
     tier = ""
     classes = ""
-    message = "Oh, ok. Here are your affixes:\n{}".format(affixes.get_text().strip())
+    message = "Here are your affixes for {}:\n{}".format(spec, affixes.get_text().strip())
     for tr in soupTier.find_all("tr"):
         tier = tr.find(class_="tier")
         scrappedTierName = tier.string.strip()
@@ -50,4 +86,3 @@ def getAffixes(URL, spec = None):
 
 
 
-getAffixes("https://mplus.subcreation.net/")
